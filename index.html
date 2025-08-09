@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detective Duo - Mystery Game</title>
+    <title>Detective Duo - Multiplayer Mystery Game</title>
     <style>
         * {
             margin: 0;
@@ -20,7 +20,7 @@
         }
 
         .game-container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             background: rgba(44, 62, 80, 0.95);
             border-radius: 15px;
@@ -48,67 +48,103 @@
             font-style: italic;
         }
 
-        .game-stats {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 30px;
+        .multiplayer-setup {
             background: rgba(52, 73, 94, 0.8);
             padding: 20px;
-            border-radius: 10px;
-        }
-
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-label {
-            font-size: 0.9rem;
-            color: #95a5a6;
-            margin-bottom: 5px;
-        }
-
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #e74c3c;
-        }
-
-        .case-selector {
+            border-radius: 15px;
             margin-bottom: 30px;
             text-align: center;
         }
 
-        .case-buttons {
+        .room-input {
             display: flex;
             gap: 15px;
             justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
             flex-wrap: wrap;
         }
 
-        .case-btn {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        .room-input input {
+            padding: 12px;
+            border: 2px solid #7f8c8d;
+            border-radius: 8px;
+            background: rgba(44, 62, 80, 0.9);
+            color: #ecf0f1;
+            font-size: 1rem;
+            min-width: 200px;
+        }
+
+        .room-input button {
+            background: linear-gradient(135deg, #27ae60, #229954);
             color: white;
             border: none;
             padding: 12px 24px;
-            border-radius: 25px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 1rem;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
         }
 
-        .case-btn:hover {
+        .room-input button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
         }
 
-        .case-btn.active {
-            background: linear-gradient(135deg, #27ae60, #229954);
+        .connection-status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-align: center;
         }
 
-        .mystery-content {
+        .connection-status.connected {
+            background: rgba(39, 174, 96, 0.3);
+            border: 1px solid #27ae60;
+        }
+
+        .connection-status.disconnected {
+            background: rgba(231, 76, 60, 0.3);
+            border: 1px solid #e74c3c;
+        }
+
+        .player-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .player-card {
+            background: rgba(44, 62, 80, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 150px;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .player-card.active-turn {
+            border-color: #f39c12;
+            background: rgba(243, 156, 18, 0.2);
+            animation: pulse 2s infinite;
+        }
+
+        .player-name {
+            font-weight: bold;
+            color: #f39c12;
+            margin-bottom: 5px;
+        }
+
+        .player-status {
+            color: #bdc3c7;
+            font-size: 0.9rem;
+        }
+
+        .game-layout {
             display: grid;
-            grid-template-columns: 1fr 300px;
+            grid-template-columns: 1fr 350px;
             gap: 30px;
             margin-bottom: 30px;
         }
@@ -118,6 +154,98 @@
             padding: 25px;
             border-radius: 15px;
             border-left: 4px solid #f39c12;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .suspects-section, .chat-section {
+            background: rgba(52, 73, 94, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .chat-section {
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            font-size: 1.3rem;
+            color: #3498db;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            background: rgba(44, 62, 80, 0.9);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: rgba(52, 73, 94, 0.8);
+            border-left: 3px solid #3498db;
+        }
+
+        .message.system {
+            border-left-color: #f39c12;
+            background: rgba(243, 156, 18, 0.2);
+            font-style: italic;
+        }
+
+        .message.player1 {
+            border-left-color: #e74c3c;
+        }
+
+        .message.player2 {
+            border-left-color: #27ae60;
+        }
+
+        .message-sender {
+            font-weight: bold;
+            color: #f39c12;
+            font-size: 0.9rem;
+        }
+
+        .message-text {
+            color: #ecf0f1;
+            margin-top: 3px;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #7f8c8d;
+            border-radius: 8px;
+            background: rgba(44, 62, 80, 0.9);
+            color: #ecf0f1;
+            font-size: 0.9rem;
+        }
+
+        .chat-send {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
         }
 
         .case-title {
@@ -132,6 +260,21 @@
             line-height: 1.6;
             margin-bottom: 25px;
             color: #ecf0f1;
+        }
+
+        .turn-indicator {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .turn-indicator.waiting {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
         }
 
         .clues-section {
@@ -170,10 +313,9 @@
             background: rgba(39, 174, 96, 0.2);
         }
 
-        .suspects-section {
-            background: rgba(52, 73, 94, 0.8);
-            padding: 20px;
-            border-radius: 15px;
+        .clue-item.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .suspects-title {
@@ -203,6 +345,11 @@
             background: rgba(231, 76, 60, 0.2);
         }
 
+        .suspect.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         .suspect-name {
             font-weight: bold;
             color: #f39c12;
@@ -215,8 +362,11 @@
         }
 
         .game-controls {
-            text-align: center;
-            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
         }
 
         .control-btn {
@@ -227,12 +377,11 @@
             border-radius: 25px;
             cursor: pointer;
             font-size: 1.1rem;
-            margin: 0 10px;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(155, 89, 182, 0.3);
         }
 
-        .control-btn:hover {
+        .control-btn:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(155, 89, 182, 0.4);
         }
@@ -242,6 +391,45 @@
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
+            opacity: 0.6;
+        }
+
+        .case-selector {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .case-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .case-btn {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .case-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+        }
+
+        .case-btn.active {
+            background: linear-gradient(135deg, #27ae60, #229954);
+        }
+
+        .case-btn:disabled {
+            background: #7f8c8d;
+            cursor: not-allowed;
+            opacity: 0.6;
         }
 
         .result-section {
@@ -261,59 +449,35 @@
             background: rgba(231, 76, 60, 0.2);
         }
 
-        .discussion-area {
-            background: rgba(52, 73, 94, 0.4);
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
+        .sync-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(39, 174, 96, 0.9);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            z-index: 1000;
         }
 
-        .discussion-title {
-            font-size: 1.2rem;
-            color: #3498db;
-            margin-bottom: 15px;
+        .sync-indicator.syncing {
+            background: rgba(243, 156, 18, 0.9);
         }
 
-        .notes-area {
-            width: 100%;
-            min-height: 100px;
-            background: rgba(44, 62, 80, 0.8);
-            border: 1px solid #7f8c8d;
-            border-radius: 8px;
-            padding: 15px;
-            color: #ecf0f1;
-            font-family: inherit;
-            resize: vertical;
-        }
-
-        .timer-section {
-            background: rgba(231, 76, 60, 0.3);
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .timer {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #e74c3c;
-        }
-
-        @media (max-width: 768px) {
-            .mystery-content {
+        @media (max-width: 1024px) {
+            .game-layout {
                 grid-template-columns: 1fr;
                 gap: 20px;
             }
             
-            .game-stats {
+            .player-info {
                 flex-direction: column;
                 gap: 15px;
             }
             
-            .case-buttons {
+            .room-input {
                 flex-direction: column;
-                align-items: center;
             }
             
             .header h1 {
@@ -323,96 +487,128 @@
     </style>
 </head>
 <body>
+    <div class="sync-indicator" id="syncIndicator">🔄 Synced</div>
+
     <div class="game-container">
         <div class="header">
-            <h1>🔍 Detective Duo 🔍</h1>
-            <p>Work together to solve mysterious cases using logic and deduction</p>
+            <h1>🔍 Detective Duo - Multiplayer 🔍</h1>
+            <p>Solve mysteries together in real-time</p>
         </div>
 
-        <div class="game-stats">
-            <div class="stat-item">
-                <div class="stat-label">Cases Solved</div>
-                <div class="stat-value" id="casesSolved">0</div>
+        <div class="multiplayer-setup">
+            <div class="room-input">
+                <input type="text" id="roomCode" placeholder="Enter room code (e.g. MYSTERY123)" maxlength="20">
+                <input type="text" id="playerName" placeholder="Your name" maxlength="15">
+                <button onclick="joinRoom()">Join Room</button>
+                <button onclick="createRoom()">Create New Room</button>
             </div>
-            <div class="stat-item">
-                <div class="stat-label">Current Streak</div>
-                <div class="stat-value" id="currentStreak">0</div>
+            
+            <div class="connection-status disconnected" id="connectionStatus">
+                🔴 Not connected - Create or join a room to play together
             </div>
-            <div class="stat-item">
-                <div class="stat-label">Success Rate</div>
-                <div class="stat-value" id="successRate">0%</div>
-            </div>
-        </div>
 
-        <div class="timer-section" id="timerSection" style="display: none;">
-            <div>Time Remaining: <span class="timer" id="timer">300</span>s</div>
-        </div>
-
-        <div class="case-selector">
-            <div class="case-buttons">
-                <button class="case-btn active" onclick="selectDifficulty('easy')">Beginner Cases</button>
-                <button class="case-btn" onclick="selectDifficulty('medium')">Intermediate Cases</button>
-                <button class="case-btn" onclick="selectDifficulty('hard')">Expert Cases</button>
-            </div>
-        </div>
-
-        <div class="mystery-content">
-            <div class="main-content">
-                <div class="case-title" id="caseTitle">Select a difficulty to begin</div>
-                <div class="case-description" id="caseDescription">
-                    Choose your difficulty level above to start solving mysteries together!
+            <div class="player-info" id="playerInfo" style="display: none;">
+                <div class="player-card" id="player1Card">
+                    <div class="player-name" id="player1Name">Player 1</div>
+                    <div class="player-status">Waiting...</div>
                 </div>
+                <div class="player-card" id="player2Card">
+                    <div class="player-name" id="player2Name">Player 2</div>
+                    <div class="player-status">Waiting...</div>
+                </div>
+            </div>
+        </div>
 
-                <div class="clues-section" id="cluesSection" style="display: none;">
-                    <div class="clues-title">
-                        🔎 Evidence & Clues
-                        <span style="font-size: 0.9rem; color: #95a5a6;">(Click to reveal)</span>
+        <div id="gameContent" style="display: none;">
+            <div class="turn-indicator" id="turnIndicator">
+                🎯 Waiting for players to connect...
+            </div>
+
+            <div class="case-selector">
+                <div class="case-buttons">
+                    <button class="case-btn active" onclick="selectDifficulty('easy')">Beginner Cases</button>
+                    <button class="case-btn" onclick="selectDifficulty('medium')">Intermediate Cases</button>
+                    <button class="case-btn" onclick="selectDifficulty('hard')">Expert Cases</button>
+                </div>
+            </div>
+
+            <div class="game-layout">
+                <div class="main-content">
+                    <div class="case-title" id="caseTitle">Select a difficulty to begin</div>
+                    <div class="case-description" id="caseDescription">
+                        Choose your difficulty level above to start solving mysteries together!
                     </div>
-                    <div id="cluesList"></div>
+
+                    <div class="clues-section" id="cluesSection" style="display: none;">
+                        <div class="clues-title">
+                            🔎 Evidence & Clues
+                            <span style="font-size: 0.9rem; color: #95a5a6;">(Take turns revealing)</span>
+                        </div>
+                        <div id="cluesList"></div>
+                    </div>
                 </div>
 
-                <div class="discussion-area">
-                    <div class="discussion-title">🤔 Detective Notes & Discussion</div>
-                    <textarea class="notes-area" id="notesArea" placeholder="Take notes, discuss theories, and work together to solve the case..."></textarea>
+                <div class="sidebar">
+                    <div class="suspects-section">
+                        <div class="suspects-title">🎭 Suspects</div>
+                        <div id="suspectsList">
+                            <p style="text-align: center; color: #95a5a6; font-style: italic;">
+                                Start a case to see suspects
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="chat-section">
+                        <div class="chat-header">💬 Detective Chat</div>
+                        <div class="chat-messages" id="chatMessages">
+                            <div class="message system">
+                                <div class="message-text">Welcome detectives! Use this chat to discuss clues and theories.</div>
+                            </div>
+                        </div>
+                        <div class="chat-input-area">
+                            <input type="text" class="chat-input" id="chatInput" placeholder="Share your thoughts..." maxlength="200">
+                            <button class="chat-send" onclick="sendMessage()">Send</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="suspects-section">
-                <div class="suspects-title">🎭 Suspects</div>
-                <div id="suspectsList">
-                    <p style="text-align: center; color: #95a5a6; font-style: italic;">
-                        Start a case to see suspects
-                    </p>
-                </div>
+            <div class="game-controls">
+                <button class="control-btn" onclick="startNewCase()" id="newCaseBtn">Start New Case</button>
+                <button class="control-btn" onclick="revealClue()" id="revealClueBtn" disabled>Reveal Next Clue</button>
+                <button class="control-btn" onclick="makeAccusation()" id="accuseBtn" disabled>Make Accusation</button>
             </div>
-        </div>
 
-        <div class="game-controls">
-            <button class="control-btn" onclick="startNewCase()" id="newCaseBtn">Start New Case</button>
-            <button class="control-btn" onclick="revealClue()" id="revealClueBtn" disabled>Reveal Next Clue (0/0)</button>
-            <button class="control-btn" onclick="makeAccusation()" id="accuseBtn" disabled>Make Accusation</button>
-            <button class="control-btn" onclick="toggleTimer()" id="timerBtn">Enable Timer Mode</button>
-        </div>
-
-        <div class="result-section" id="resultSection">
-            <h2 id="resultTitle">Case Solved!</h2>
-            <p id="resultText"></p>
+            <div class="result-section" id="resultSection">
+                <h2 id="resultTitle">Case Solved!</h2>
+                <p id="resultText"></p>
+            </div>
         </div>
     </div>
 
     <script>
-        let currentDifficulty = 'easy';
-        let currentCase = null;
-        let revealedClues = 0;
-        let selectedSuspect = null;
-        let gameStats = {
-            solved: 0,
-            attempted: 0,
-            streak: 0
+        // Game state
+        let gameState = {
+            roomCode: '',
+            players: {},
+            currentCase: null,
+            difficulty: 'easy',
+            revealedClues: 0,
+            selectedSuspects: {},
+            currentTurn: 1,
+            gamePhase: 'setup', // setup, playing, accusation, finished
+            isHost: false
         };
-        let timerEnabled = false;
-        let timeLeft = 300;
-        let timerInterval = null;
+
+        let localPlayer = {
+            id: null,
+            name: '',
+            playerNumber: null
+        };
+
+        // Simulated multiplayer (in a real app, you'd use WebSockets or Firebase)
+        let gameData = {};
+        let syncInterval;
 
         const mysteries = {
             easy: [
@@ -502,58 +698,259 @@
             ]
         };
 
+        // Initialize
+        document.getElementById('chatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        function createRoom() {
+            const playerName = document.getElementById('playerName').value.trim();
+            if (!playerName) {
+                alert('Please enter your name first!');
+                return;
+            }
+
+            const roomCode = 'ROOM' + Math.random().toString(36).substr(2, 6).toUpperCase();
+            document.getElementById('roomCode').value = roomCode;
+            
+            gameState.isHost = true;
+            joinRoom();
+        }
+
+        function joinRoom() {
+            const roomCode = document.getElementById('roomCode').value.trim().toUpperCase();
+            const playerName = document.getElementById('playerName').value.trim();
+
+            if (!roomCode || !playerName) {
+                alert('Please enter both room code and your name!');
+                return;
+            }
+
+            // Initialize or join room
+            if (!gameData[roomCode]) {
+                gameData[roomCode] = {
+                    players: {},
+                    gameState: {
+                        roomCode: roomCode,
+                        difficulty: 'easy',
+                        currentCase: null,
+                        revealedClues: 0,
+                        selectedSuspects: {},
+                        currentTurn: 1,
+                        gamePhase: 'setup',
+                        messages: []
+                    }
+                };
+            }
+
+            // Add player
+            localPlayer.id = 'player_' + Date.now();
+            localPlayer.name = playerName;
+            
+            const existingPlayerCount = Object.keys(gameData[roomCode].players).length;
+            if (existingPlayerCount >= 2) {
+                alert('Room is full! Only 2 players allowed.');
+                return;
+            }
+
+            localPlayer.playerNumber = existingPlayerCount + 1;
+            gameData[roomCode].players[localPlayer.id] = {
+                name: playerName,
+                playerNumber: localPlayer.playerNumber,
+                connected: true
+            };
+
+            gameState = {...gameData[roomCode].gameState};
+            gameState.roomCode = roomCode;
+
+            // Update UI
+            document.getElementById('connectionStatus').textContent = `🟢 Connected to room: ${roomCode}`;
+            document.getElementById('connectionStatus').className = 'connection-status connected';
+            document.getElementById('playerInfo').style.display = 'flex';
+            document.getElementById('gameContent').style.display = 'block';
+
+            updatePlayerInfo();
+            updateTurnIndicator();
+            loadMessages();
+            
+            addSystemMessage(`${playerName} joined the room`);
+
+            // Start sync
+            startSync();
+        }
+
+        function startSync() {
+            if (syncInterval) clearInterval(syncInterval);
+            syncInterval = setInterval(syncGameState, 1000);
+        }
+
+        function syncGameState() {
+            if (!gameState.roomCode) return;
+
+            // Update local changes to shared data
+            if (gameData[gameState.roomCode]) {
+                gameData[gameState.roomCode].gameState = {...gameState};
+                gameData[gameState.roomCode].players[localPlayer.id].connected = true;
+            }
+
+            // Pull changes from shared data
+            const sharedState = gameData[gameState.roomCode]?.gameState;
+            if (sharedState) {
+                const oldRevealedClues = gameState.revealedClues;
+                const oldGamePhase = gameState.gamePhase;
+                
+                gameState = {...sharedState};
+                
+                // Update UI if state changed
+                if (oldRevealedClues !== gameState.revealedClues) {
+                    updateCluesUI();
+                }
+                if (oldGamePhase !== gameState.gamePhase) {
+                    updateGamePhaseUI();
+                }
+                
+                updatePlayerInfo();
+                updateTurnIndicator();
+                updateButtonStates();
+                loadMessages();
+            }
+
+            // Update sync indicator
+            const indicator = document.getElementById('syncIndicator');
+            indicator.textContent = '✅ Synced';
+            indicator.className = 'sync-indicator';
+        }
+
+        function updatePlayerInfo() {
+            if (!gameData[gameState.roomCode]) return;
+
+            const players = gameData[gameState.roomCode].players;
+            const playerArray = Object.values(players);
+
+            for (let i = 1; i <= 2; i++) {
+                const player = playerArray.find(p => p.playerNumber === i);
+                const nameElement = document.getElementById(`player${i}Name`);
+                const cardElement = document.getElementById(`player${i}Card`);
+                
+                if (player) {
+                    nameElement.textContent = player.name;
+                    cardElement.querySelector('.player-status').textContent = 
+                        player.connected ? 'Connected' : 'Disconnected';
+                } else {
+                    nameElement.textContent = `Player ${i}`;
+                    cardElement.querySelector('.player-status').textContent = 'Waiting to join...';
+                }
+
+                // Highlight current turn
+                if (gameState.currentTurn === i && gameState.gamePhase === 'playing') {
+                    cardElement.classList.add('active-turn');
+                } else {
+                    cardElement.classList.remove('active-turn');
+                }
+            }
+        }
+
+        function updateTurnIndicator() {
+            const indicator = document.getElementById('turnIndicator');
+            const playerCount = Object.keys(gameData[gameState.roomCode]?.players || {}).length;
+            
+            if (playerCount < 2) {
+                indicator.textContent = '⏳ Waiting for second player to join...';
+                indicator.className = 'turn-indicator waiting';
+            } else if (gameState.gamePhase === 'setup') {
+                indicator.textContent = '🎯 Both players connected! Start a new case to begin.';
+                indicator.className = 'turn-indicator';
+            } else if (gameState.gamePhase === 'playing') {
+                const currentPlayerName = getCurrentPlayerName();
+                const isMyTurn = gameState.currentTurn === localPlayer.playerNumber;
+                
+                if (isMyTurn) {
+                    indicator.textContent = `🎯 Your turn! Reveal a clue or select a suspect.`;
+                    indicator.className = 'turn-indicator';
+                } else {
+                    indicator.textContent = `⏳ ${currentPlayerName}'s turn - waiting for their move...`;
+                    indicator.className = 'turn-indicator waiting';
+                }
+            } else if (gameState.gamePhase === 'accusation') {
+                indicator.textContent = '⚖️ Time for accusations! Both players select your suspects.';
+                indicator.className = 'turn-indicator';
+            } else if (gameState.gamePhase === 'finished') {
+                indicator.textContent = '🎉 Case closed! Start a new case to continue playing.';
+                indicator.className = 'turn-indicator';
+            }
+        }
+
+        function getCurrentPlayerName() {
+            if (!gameData[gameState.roomCode]) return 'Player';
+            
+            const players = Object.values(gameData[gameState.roomCode].players);
+            const currentPlayer = players.find(p => p.playerNumber === gameState.currentTurn);
+            return currentPlayer ? currentPlayer.name : 'Player';
+        }
+
         function selectDifficulty(difficulty) {
-            currentDifficulty = difficulty;
+            if (!canMakeMove()) return;
+            
+            gameState.difficulty = difficulty;
             document.querySelectorAll('.case-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
             
             document.getElementById('caseTitle').textContent = `${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)} Cases Selected`;
             document.getElementById('caseDescription').textContent = `Click "Start New Case" to begin a ${difficulty} mystery!`;
-            resetCase();
+            
+            addSystemMessage(`Difficulty set to ${difficulty}`);
+            syncGameState();
         }
 
         function startNewCase() {
-            const cases = mysteries[currentDifficulty];
-            currentCase = cases[Math.floor(Math.random() * cases.length)];
+            if (!canMakeMove() || Object.keys(gameData[gameState.roomCode]?.players || {}).length < 2) {
+                alert('Wait for both players to connect!');
+                return;
+            }
+
+            const cases = mysteries[gameState.difficulty];
+            gameState.currentCase = cases[Math.floor(Math.random() * cases.length)];
+            gameState.gamePhase = 'playing';
+            gameState.revealedClues = 0;
+            gameState.selectedSuspects = {};
+            gameState.currentTurn = 1;
             
-            document.getElementById('caseTitle').textContent = currentCase.title;
-            document.getElementById('caseDescription').textContent = currentCase.description;
+            document.getElementById('caseTitle').textContent = gameState.currentCase.title;
+            document.getElementById('caseDescription').textContent = gameState.currentCase.description;
             document.getElementById('cluesSection').style.display = 'block';
-            
-            // Reset game state
-            revealedClues = 0;
-            selectedSuspect = null;
             document.getElementById('resultSection').classList.remove('show', 'wrong');
             
-            // Setup clues
             setupClues();
             setupSuspects();
-            updateButtons();
+            updateButtonStates();
+            updateTurnIndicator();
             
-            // Start timer if enabled
-            if (timerEnabled) {
-                startTimer();
-            }
+            addSystemMessage(`New case started: ${gameState.currentCase.title}`);
+            syncGameState();
         }
 
         function setupClues() {
             const cluesList = document.getElementById('cluesList');
             cluesList.innerHTML = '';
             
-            currentCase.clues.forEach((clue, index) => {
+            gameState.currentCase.clues.forEach((clue, index) => {
                 const clueDiv = document.createElement('div');
                 clueDiv.className = 'clue-item';
                 clueDiv.innerHTML = `<strong>Clue ${index + 1}:</strong> <span class="clue-text">Click to reveal</span>`;
                 clueDiv.onclick = () => revealSpecificClue(index);
                 cluesList.appendChild(clueDiv);
             });
+            
+            updateCluesUI();
         }
 
         function setupSuspects() {
             const suspectsList = document.getElementById('suspectsList');
             suspectsList.innerHTML = '';
             
-            currentCase.suspects.forEach((suspect, index) => {
+            gameState.currentCase.suspects.forEach((suspect, index) => {
                 const suspectDiv = document.createElement('div');
                 suspectDiv.className = 'suspect';
                 suspectDiv.innerHTML = `
@@ -563,158 +960,269 @@
                 suspectDiv.onclick = () => selectSuspect(suspect.name, suspectDiv);
                 suspectsList.appendChild(suspectDiv);
             });
+            
+            updateSuspectsUI();
         }
 
         function revealClue() {
-            if (revealedClues < currentCase.clues.length) {
-                revealSpecificClue(revealedClues);
+            if (!canMakeMove() || gameState.gamePhase !== 'playing') return;
+            
+            if (gameState.revealedClues < gameState.currentCase.clues.length) {
+                revealSpecificClue(gameState.revealedClues);
+                nextTurn();
             }
         }
 
         function revealSpecificClue(index) {
+            if (!canMakeMove() || gameState.gamePhase !== 'playing') return;
+            if (index !== gameState.revealedClues) return; // Must reveal in order
+            
+            gameState.revealedClues = Math.max(gameState.revealedClues, index + 1);
+            
+            const currentPlayerName = getCurrentPlayerName();
+            addSystemMessage(`${currentPlayerName} revealed: "${gameState.currentCase.clues[index]}"`);
+            
+            updateCluesUI();
+            updateButtonStates();
+            syncGameState();
+            
+            nextTurn();
+        }
+
+        function updateCluesUI() {
             const clueItems = document.querySelectorAll('.clue-item');
-            if (index < clueItems.length && !clueItems[index].classList.contains('revealed')) {
-                clueItems[index].classList.add('revealed');
-                clueItems[index].querySelector('.clue-text').textContent = currentCase.clues[index];
-                revealedClues = Math.max(revealedClues, index + 1);
-                updateButtons();
-            }
+            clueItems.forEach((clueItem, index) => {
+                if (index < gameState.revealedClues) {
+                    clueItem.classList.add('revealed');
+                    clueItem.querySelector('.clue-text').textContent = gameState.currentCase.clues[index];
+                }
+                
+                // Only allow revealing next clue in sequence
+                if (index === gameState.revealedClues && canMakeMove() && gameState.gamePhase === 'playing') {
+                    clueItem.classList.remove('disabled');
+                } else if (index > gameState.revealedClues) {
+                    clueItem.classList.add('disabled');
+                }
+            });
         }
 
         function selectSuspect(name, element) {
-            document.querySelectorAll('.suspect').forEach(s => s.classList.remove('selected'));
-            element.classList.add('selected');
-            selectedSuspect = name;
-            updateButtons();
+            if (gameState.gamePhase === 'playing') {
+                // During playing phase, only current player can select
+                if (!canMakeMove()) return;
+                
+                gameState.selectedSuspects[localPlayer.playerNumber] = name;
+                addSystemMessage(`${localPlayer.name} suspects ${name}`);
+                
+                // If all clues revealed, move to accusation phase
+                if (gameState.revealedClues >= gameState.currentCase.clues.length) {
+                    gameState.gamePhase = 'accusation';
+                    addSystemMessage('All clues revealed! Time for final accusations.');
+                }
+                
+                nextTurn();
+            } else if (gameState.gamePhase === 'accusation') {
+                // Both players can select during accusation phase
+                gameState.selectedSuspects[localPlayer.playerNumber] = name;
+                addSystemMessage(`${localPlayer.name} accuses ${name}`);
+            } else {
+                return;
+            }
+            
+            updateSuspectsUI();
+            updateButtonStates();
+            updateTurnIndicator();
+            syncGameState();
+        }
+
+        function updateSuspectsUI() {
+            const suspects = document.querySelectorAll('.suspect');
+            suspects.forEach(suspectDiv => {
+                suspectDiv.classList.remove('selected');
+                
+                const suspectName = suspectDiv.querySelector('.suspect-name').textContent;
+                
+                // Show if this player selected this suspect
+                if (gameState.selectedSuspects[localPlayer.playerNumber] === suspectName) {
+                    suspectDiv.classList.add('selected');
+                }
+                
+                // Disable if not player's turn (during playing phase)
+                if (gameState.gamePhase === 'playing' && !canMakeMove()) {
+                    suspectDiv.classList.add('disabled');
+                } else {
+                    suspectDiv.classList.remove('disabled');
+                }
+            });
         }
 
         function makeAccusation() {
-            if (!selectedSuspect) {
-                alert('Please select a suspect first!');
+            if (gameState.gamePhase !== 'accusation') {
+                alert('Reveal all clues first!');
                 return;
             }
 
-            stopTimer();
-            gameStats.attempted++;
-
-            const resultSection = document.getElementById('resultSection');
-            const resultTitle = document.getElementById('resultTitle');
-            const resultText = document.getElementById('resultText');
-
-            if (selectedSuspect === currentCase.solution) {
-                // Correct!
-                gameStats.solved++;
-                gameStats.streak++;
-                resultSection.classList.add('show');
-                resultSection.classList.remove('wrong');
-                resultTitle.textContent = '🎉 Case Solved! 🎉';
-                resultText.innerHTML = `
-                    <p><strong>Congratulations, detectives!</strong></p>
-                    <p>You correctly identified <strong>${selectedSuspect}</strong> as the culprit!</p>
-                    <p><strong>Solution:</strong> ${currentCase.explanation}</p>
-                `;
-            } else {
-                // Wrong!
-                gameStats.streak = 0;
-                resultSection.classList.add('show', 'wrong');
-                resultTitle.textContent = '❌ Case Unsolved ❌';
-                resultText.innerHTML = `
-                    <p><strong>Not quite right!</strong></p>
-                    <p>The real culprit was <strong>${currentCase.solution}</strong>, not ${selectedSuspect}.</p>
-                    <p><strong>Solution:</strong> ${currentCase.explanation}</p>
-                    <p>Review the clues and try another case!</p>
-                `;
+            if (Object.keys(gameState.selectedSuspects).length < 2) {
+                alert('Both players must select a suspect!');
+                return;
             }
 
-            updateStats();
-            updateButtons();
-        }
-
-        function updateStats() {
-            document.getElementById('casesSolved').textContent = gameStats.solved;
-            document.getElementById('currentStreak').textContent = gameStats.streak;
-            const rate = gameStats.attempted > 0 ? Math.round((gameStats.solved / gameStats.attempted) * 100) : 0;
-            document.getElementById('successRate').textContent = rate + '%';
-        }
-
-        function updateButtons() {
-            const hasCase = currentCase !== null;
-            const hasSelectedSuspect = selectedSuspect !== null;
-            const hasMoreClues = hasCase && revealedClues < currentCase.clues.length;
-
-            document.getElementById('revealClueBtn').disabled = !hasMoreClues;
-            document.getElementById('accuseBtn').disabled = !hasSelectedSuspect;
+            // Process results
+            gameState.gamePhase = 'finished';
             
+            const player1Suspect = gameState.selectedSuspects[1];
+            const player2Suspect = gameState.selectedSuspects[2];
+            const solution = gameState.currentCase.solution;
+            
+            const player1Correct = player1Suspect === solution;
+            const player2Correct = player2Suspect === solution;
+            
+            let resultTitle, resultText, resultClass;
+            
+            if (player1Correct && player2Correct) {
+                resultTitle = '🎉 Perfect Teamwork! 🎉';
+                resultText = `Both detectives correctly identified <strong>${solution}</strong>!<br><br><strong>Solution:</strong> ${gameState.currentCase.explanation}`;
+                resultClass = '';
+            } else if (player1Correct || player2Correct) {
+                const correctPlayer = player1Correct ? getPlayerName(1) : getPlayerName(2);
+                resultTitle = '🎯 Partial Success!';
+                resultText = `${correctPlayer} correctly identified <strong>${solution}</strong>!<br><br><strong>Solution:</strong> ${gameState.currentCase.explanation}`;
+                resultClass = '';
+            } else {
+                resultTitle = '❌ Case Unsolved ❌';
+                resultText = `Neither detective got it right! The real culprit was <strong>${solution}</strong>.<br><br><strong>Solution:</strong> ${gameState.currentCase.explanation}`;
+                resultClass = 'wrong';
+            }
+            
+            document.getElementById('resultTitle').innerHTML = resultTitle;
+            document.getElementById('resultText').innerHTML = resultText;
+            document.getElementById('resultSection').className = `result-section show ${resultClass}`;
+            
+            addSystemMessage(`Case finished! Solution: ${solution}`);
+            
+            updateButtonStates();
+            updateTurnIndicator();
+            syncGameState();
+        }
+
+        function getPlayerName(playerNumber) {
+            if (!gameData[gameState.roomCode]) return `Player ${playerNumber}`;
+            
+            const players = Object.values(gameData[gameState.roomCode].players);
+            const player = players.find(p => p.playerNumber === playerNumber);
+            return player ? player.name : `Player ${playerNumber}`;
+        }
+
+        function nextTurn() {
+            if (gameState.gamePhase === 'playing') {
+                gameState.currentTurn = gameState.currentTurn === 1 ? 2 : 1;
+                updateTurnIndicator();
+            }
+        }
+
+        function canMakeMove() {
+            return gameState.currentTurn === localPlayer.playerNumber;
+        }
+
+        function updateButtonStates() {
+            const hasCase = gameState.currentCase !== null;
+            const isPlaying = gameState.gamePhase === 'playing';
+            const isAccusation = gameState.gamePhase === 'accusation';
+            const hasMoreClues = hasCase && gameState.revealedClues < gameState.currentCase.clues.length;
+            const bothPlayersSelected = Object.keys(gameState.selectedSuspects).length >= 2;
+            const myTurn = canMakeMove();
+            const playerCount = Object.keys(gameData[gameState.roomCode]?.players || {}).length;
+            
+            // Difficulty buttons
+            document.querySelectorAll('.case-btn').forEach(btn => {
+                btn.disabled = hasCase && isPlaying;
+            });
+            
+            // New case button
+            document.getElementById('newCaseBtn').disabled = playerCount < 2;
+            
+            // Reveal clue button
+            const revealBtn = document.getElementById('revealClueBtn');
+            revealBtn.disabled = !hasCase || !isPlaying || !hasMoreClues || !myTurn;
             if (hasCase) {
-                document.getElementById('revealClueBtn').textContent = 
-                    `Reveal Next Clue (${revealedClues}/${currentCase.clues.length})`;
+                revealBtn.textContent = `Reveal Next Clue (${gameState.revealedClues}/${gameState.currentCase.clues.length})`;
             }
+            
+            // Accusation button
+            document.getElementById('accuseBtn').disabled = !isAccusation || !bothPlayersSelected;
         }
 
-        function toggleTimer() {
-            timerEnabled = !timerEnabled;
-            const btn = document.getElementById('timerBtn');
-            const timerSection = document.getElementById('timerSection');
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
             
-            if (timerEnabled) {
-                btn.textContent = 'Disable Timer Mode';
-                timerSection.style.display = 'block';
-                if (currentCase) startTimer();
-            } else {
-                btn.textContent = 'Enable Timer Mode';
-                timerSection.style.display = 'none';
-                stopTimer();
-            }
+            if (!message || !gameState.roomCode) return;
+            
+            const messageObj = {
+                id: Date.now(),
+                sender: localPlayer.name,
+                playerNumber: localPlayer.playerNumber,
+                text: message,
+                timestamp: new Date().toLocaleTimeString()
+            };
+            
+            gameState.messages = gameState.messages || [];
+            gameState.messages.push(messageObj);
+            
+            input.value = '';
+            loadMessages();
+            syncGameState();
         }
 
-        function startTimer() {
-            stopTimer();
-            timeLeft = 300; // 5 minutes
-            updateTimerDisplay();
+        function addSystemMessage(text) {
+            const messageObj = {
+                id: Date.now(),
+                sender: 'System',
+                playerNumber: 0,
+                text: text,
+                timestamp: new Date().toLocaleTimeString()
+            };
             
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                updateTimerDisplay();
+            gameState.messages = gameState.messages || [];
+            gameState.messages.push(messageObj);
+            
+            loadMessages();
+        }
+
+        function loadMessages() {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messages = gameState.messages || [];
+            
+            // Only show recent messages to avoid clutter
+            const recentMessages = messages.slice(-20);
+            
+            messagesContainer.innerHTML = recentMessages.map(msg => {
+                let messageClass = 'message';
+                if (msg.playerNumber === 0) messageClass += ' system';
+                else if (msg.playerNumber === 1) messageClass += ' player1';
+                else if (msg.playerNumber === 2) messageClass += ' player2';
                 
-                if (timeLeft <= 0) {
-                    stopTimer();
-                    alert('Time\'s up! The case remains unsolved...');
-                    gameStats.attempted++;
-                    gameStats.streak = 0;
-                    updateStats();
-                }
-            }, 1000);
+                return `
+                    <div class="${messageClass}">
+                        ${msg.playerNumber > 0 ? `<div class="message-sender">${msg.sender}</div>` : ''}
+                        <div class="message-text">${msg.text}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Scroll to bottom
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
-        function stopTimer() {
-            if (timerInterval) {
-                clearInterval(timerInterval);
-                timerInterval = null;
-            }
+        function updateGamePhaseUI() {
+            updateButtonStates();
+            updateTurnIndicator();
+            updateSuspectsUI();
+            updateCluesUI();
         }
 
-        function updateTimerDisplay() {
-            const minutes = Math.floor(timeLeft / 60);
-            const seconds = timeLeft % 60;
-            document.getElementById('timer').textContent = 
-                `${minutes}:${seconds.toString().padStart(2, '0')}`;
-        }
-
-        function resetCase() {
-            currentCase = null;
-            selectedSuspect = null;
-            revealedClues = 0;
-            document.getElementById('cluesSection').style.display = 'none';
-            document.getElementById('suspectsList').innerHTML = '<p style="text-align: center; color: #95a5a6; font-style: italic;">Start a case to see suspects</p>';
-            document.getElementById('resultSection').classList.remove('show', 'wrong');
-            document.getElementById('notesArea').value = '';
-            stopTimer();
-            updateButtons();
-        }
-
-        // Initialize the game
-        updateStats();
-        updateButtons();
+        // Initialize
+        updateButtonStates();
     </script>
 </body>
 </html>
