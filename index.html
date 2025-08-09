@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detective Duo - Mystery Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #ecf0f1;
+        }
+
+        .game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(44, 62, 80, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(236, 240, 241, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            color: #f39c12;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: #bdc3c7;
+            font-style: italic;
+        }
+
+        .game-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            background: rgba(52, 73, 94, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #95a5a6;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+
+        .case-selector {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .case-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .case-btn {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .case-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+        }
+
+        .case-btn.active {
+            background: linear-gradient(135deg, #27ae60, #229954);
+        }
+
+        .mystery-content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .main-content {
+            background: rgba(52, 73, 94, 0.6);
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 4px solid #f39c12;
+        }
+
+        .case-title {
+            font-size: 2rem;
+            color: #f39c12;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .case-description {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            color: #ecf0f1;
+        }
+
+        .clues-section {
+            background: rgba(39, 174, 96, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .clues-title {
+            font-size: 1.3rem;
+            color: #27ae60;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .clue-item {
+            background: rgba(44, 62, 80, 0.8);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 3px solid #3498db;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .clue-item:hover {
+            background: rgba(52, 73, 94, 1);
+            transform: translateX(5px);
+        }
+
+        .clue-item.revealed {
+            border-left-color: #27ae60;
+            background: rgba(39, 174, 96, 0.2);
+        }
+
+        .suspects-section {
+            background: rgba(52, 73, 94, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .suspects-title {
+            font-size: 1.3rem;
+            color: #e74c3c;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .suspect {
+            background: rgba(44, 62, 80, 0.9);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .suspect:hover {
+            border-color: #f39c12;
+            transform: scale(1.02);
+        }
+
+        .suspect.selected {
+            border-color: #e74c3c;
+            background: rgba(231, 76, 60, 0.2);
+        }
+
+        .suspect-name {
+            font-weight: bold;
+            color: #f39c12;
+            margin-bottom: 5px;
+        }
+
+        .suspect-info {
+            font-size: 0.9rem;
+            color: #bdc3c7;
+        }
+
+        .game-controls {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .control-btn {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(155, 89, 182, 0.3);
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(155, 89, 182, 0.4);
+        }
+
+        .control-btn:disabled {
+            background: #7f8c8d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .result-section {
+            background: rgba(39, 174, 96, 0.2);
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .result-section.show {
+            display: block;
+        }
+
+        .result-section.wrong {
+            background: rgba(231, 76, 60, 0.2);
+        }
+
+        .discussion-area {
+            background: rgba(52, 73, 94, 0.4);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .discussion-title {
+            font-size: 1.2rem;
+            color: #3498db;
+            margin-bottom: 15px;
+        }
+
+        .notes-area {
+            width: 100%;
+            min-height: 100px;
+            background: rgba(44, 62, 80, 0.8);
+            border: 1px solid #7f8c8d;
+            border-radius: 8px;
+            padding: 15px;
+            color: #ecf0f1;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .timer-section {
+            background: rgba(231, 76, 60, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .timer {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+
+        @media (max-width: 768px) {
+            .mystery-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .game-stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .case-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>🔍 Detective Duo 🔍</h1>
+            <p>Work together to solve mysterious cases using logic and deduction</p>
+        </div>
+
+        <div class="game-stats">
+            <div class="stat-item">
+                <div class="stat-label">Cases Solved</div>
+                <div class="stat-value" id="casesSolved">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Current Streak</div>
+                <div class="stat-value" id="currentStreak">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Success Rate</div>
+                <div class="stat-value" id="successRate">0%</div>
+            </div>
+        </div>
+
+        <div class="timer-section" id="timerSection" style="display: none;">
+            <div>Time Remaining: <span class="timer" id="timer">300</span>s</div>
+        </div>
+
+        <div class="case-selector">
+            <div class="case-buttons">
+                <button class="case-btn active" onclick="selectDifficulty('easy')">Beginner Cases</button>
+                <button class="case-btn" onclick="selectDifficulty('medium')">Intermediate Cases</button>
+                <button class="case-btn" onclick="selectDifficulty('hard')">Expert Cases</button>
+            </div>
+        </div>
+
+        <div class="mystery-content">
+            <div class="main-content">
+                <div class="case-title" id="caseTitle">Select a difficulty to begin</div>
+                <div class="case-description" id="caseDescription">
+                    Choose your difficulty level above to start solving mysteries together!
+                </div>
+
+                <div class="clues-section" id="cluesSection" style="display: none;">
+                    <div class="clues-title">
+                        🔎 Evidence & Clues
+                        <span style="font-size: 0.9rem; color: #95a5a6;">(Click to reveal)</span>
+                    </div>
+                    <div id="cluesList"></div>
+                </div>
+
+                <div class="discussion-area">
+                    <div class="discussion-title">🤔 Detective Notes & Discussion</div>
+                    <textarea class="notes-area" id="notesArea" placeholder="Take notes, discuss theories, and work together to solve the case..."></textarea>
+                </div>
+            </div>
+
+            <div class="suspects-section">
+                <div class="suspects-title">🎭 Suspects</div>
+                <div id="suspectsList">
+                    <p style="text-align: center; color: #95a5a6; font-style: italic;">
+                        Start a case to see suspects
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-controls">
+            <button class="control-btn" onclick="startNewCase()" id="newCaseBtn">Start New Case</button>
+            <button class="control-btn" onclick="revealClue()" id="revealClueBtn" disabled>Reveal Next Clue (0/0)</button>
+            <button class="control-btn" onclick="makeAccusation()" id="accuseBtn" disabled>Make Accusation</button>
+            <button class="control-btn" onclick="toggleTimer()" id="timerBtn">Enable Timer Mode</button>
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <h2 id="resultTitle">Case Solved!</h2>
+            <p id="resultText"></p>
+        </div>
+    </div>
+
+    <script>
+        let currentDifficulty = 'easy';
+        let currentCase = null;
+        let revealedClues = 0;
+        let selectedSuspect = null;
+        let gameStats = {
+            solved: 0,
+            attempted: 0,
+            streak: 0
+        };
+        let timerEnabled = false;
+        let timeLeft = 300;
+        let timerInterval = null;
+
+        const mysteries = {
+            easy: [
+                {
+                    title: "The Missing Cookies",
+                    description: "Mrs. Johnson's famous chocolate chip cookies have disappeared from the kitchen counter. The jar was full this morning, but now it's completely empty. Three people were home today, and each has an alibi. Who took the cookies?",
+                    clues: [
+                        "Crumbs were found leading to Tommy's room",
+                        "Sarah was at school all day according to attendance records", 
+                        "Dad's coffee mug had chocolate smudges on it",
+                        "Tommy claimed he was playing video games all afternoon",
+                        "The cookie jar was moved from its usual spot",
+                        "Mom found an empty milk glass in Dad's office"
+                    ],
+                    suspects: [
+                        { name: "Tommy", info: "Age 12, loves cookies, was home from school with a cold" },
+                        { name: "Sarah", info: "Age 16, on a diet, claims she was at school" },
+                        { name: "Dad", info: "Works from home, always snacks while working" }
+                    ],
+                    solution: "Dad",
+                    explanation: "Dad took the cookies! The chocolate smudges on his coffee mug, the empty milk glass in his office, and the moved cookie jar all point to him sneaking cookies while working."
+                },
+                {
+                    title: "The Broken Vase",
+                    description: "A valuable family vase has been shattered in the living room. It happened sometime between 2 PM and 4 PM when everyone was home. Each family member claims they weren't near the living room during that time.",
+                    clues: [
+                        "Soccer ball found under the couch nearby",
+                        "Jenny's homework was spread on the living room table",
+                        "The TV remote was on the floor next to the vase pieces",
+                        "Mom was cooking in the kitchen, which faces away from the living room",
+                        "Dad was taking a nap upstairs during that time",
+                        "Fresh grass stains on the soccer ball"
+                    ],
+                    suspects: [
+                        { name: "Jenny", info: "Age 14, doing homework, claims she stayed at the table" },
+                        { name: "Mike", info: "Age 10, was playing soccer outside earlier" }, 
+                        { name: "Dad", info: "Was napping upstairs, very tired from work" }
+                    ],
+                    solution: "Mike",
+                    explanation: "Mike broke the vase! He brought his soccer ball inside and accidentally knocked over the vase while playing. The grass stains prove he was playing outside earlier, and the ball's location gives him away."
+                }
+            ],
+            medium: [
+                {
+                    title: "The Office Sabotage",
+                    description: "Someone has been deleting important files from the company server every Friday night. The IT logs show the deletions happen between 7 PM and 9 PM. Security footage shows three employees with access during those times over the past month.",
+                    clues: [
+                        "The deleted files were all related to the marketing department",
+                        "Alex's keycard was used to enter the building at 7:15 PM last Friday",
+                        "Lisa's computer was logged in remotely during the deletion time",
+                        "Jordan was seen leaving the office at 6:30 PM by security",
+                        "The marketing budget was recently cut, affecting bonuses",
+                        "Alex and Lisa are both up for the same promotion",
+                        "Jordan's project was cancelled due to budget constraints"
+                    ],
+                    suspects: [
+                        { name: "Alex", info: "Marketing coordinator, ambitious, needs the promotion for financial reasons" },
+                        { name: "Lisa", info: "Senior marketing analyst, works late often, tech-savvy" },
+                        { name: "Jordan", info: "Project manager, bitter about recent layoffs and budget cuts" }
+                    ],
+                    solution: "Jordan",
+                    explanation: "Jordan is the saboteur! Despite leaving at 6:30 PM, they used their remote access to delete files. The cancelled project and budget cuts gave them motive for revenge against the marketing department."
+                }
+            ],
+            hard: [
+                {
+                    title: "The Locked Room Murder",
+                    description: "Renowned detective novelist Edgar Blackwood was found dead in his locked study. The door was locked from the inside, windows were sealed shut, and no weapon was found. Three people had access to the house that evening, each with their own key and alibi.",
+                    clues: [
+                        "Blackwood's latest manuscript revealed a character based on someone he knew",
+                        "The victim's coffee cup contained traces of a rare poison",
+                        "Victoria's purse contained the same type of poison used in her research",
+                        "Marcus's fingerprints were on the coffee pot in the kitchen",
+                        "Helena was seen arguing with Blackwood about money two days prior",
+                        "The study's ventilation system had been recently tampered with",
+                        "A small hole was drilled through the wall behind a bookshelf",
+                        "Victoria had access to the house's original blueprints"
+                    ],
+                    suspects: [
+                        { name: "Victoria", info: "Forensic scientist, Blackwood's research partner, knew his habits well" },
+                        { name: "Marcus", info: "Blackwood's nephew and heir, deeply in debt" },
+                        { name: "Helena", info: "Blackwood's ex-wife, bitter about the divorce settlement" }
+                    ],
+                    solution: "Victoria",
+                    explanation: "Victoria murdered Blackwood! She used her scientific knowledge to create a delayed poison delivery system through the ventilation. The hole behind the bookshelf allowed her to introduce the poison remotely, creating the perfect locked room murder."
+                }
+            ]
+        };
+
+        function selectDifficulty(difficulty) {
+            currentDifficulty = difficulty;
+            document.querySelectorAll('.case-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('caseTitle').textContent = `${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)} Cases Selected`;
+            document.getElementById('caseDescription').textContent = `Click "Start New Case" to begin a ${difficulty} mystery!`;
+            resetCase();
+        }
+
+        function startNewCase() {
+            const cases = mysteries[currentDifficulty];
+            currentCase = cases[Math.floor(Math.random() * cases.length)];
+            
+            document.getElementById('caseTitle').textContent = currentCase.title;
+            document.getElementById('caseDescription').textContent = currentCase.description;
+            document.getElementById('cluesSection').style.display = 'block';
+            
+            // Reset game state
+            revealedClues = 0;
+            selectedSuspect = null;
+            document.getElementById('resultSection').classList.remove('show', 'wrong');
+            
+            // Setup clues
+            setupClues();
+            setupSuspects();
+            updateButtons();
+            
+            // Start timer if enabled
+            if (timerEnabled) {
+                startTimer();
+            }
+        }
+
+        function setupClues() {
+            const cluesList = document.getElementById('cluesList');
+            cluesList.innerHTML = '';
+            
+            currentCase.clues.forEach((clue, index) => {
+                const clueDiv = document.createElement('div');
+                clueDiv.className = 'clue-item';
+                clueDiv.innerHTML = `<strong>Clue ${index + 1}:</strong> <span class="clue-text">Click to reveal</span>`;
+                clueDiv.onclick = () => revealSpecificClue(index);
+                cluesList.appendChild(clueDiv);
+            });
+        }
+
+        function setupSuspects() {
+            const suspectsList = document.getElementById('suspectsList');
+            suspectsList.innerHTML = '';
+            
+            currentCase.suspects.forEach((suspect, index) => {
+                const suspectDiv = document.createElement('div');
+                suspectDiv.className = 'suspect';
+                suspectDiv.innerHTML = `
+                    <div class="suspect-name">${suspect.name}</div>
+                    <div class="suspect-info">${suspect.info}</div>
+                `;
+                suspectDiv.onclick = () => selectSuspect(suspect.name, suspectDiv);
+                suspectsList.appendChild(suspectDiv);
+            });
+        }
+
+        function revealClue() {
+            if (revealedClues < currentCase.clues.length) {
+                revealSpecificClue(revealedClues);
+            }
+        }
+
+        function revealSpecificClue(index) {
+            const clueItems = document.querySelectorAll('.clue-item');
+            if (index < clueItems.length && !clueItems[index].classList.contains('revealed')) {
+                clueItems[index].classList.add('revealed');
+                clueItems[index].querySelector('.clue-text').textContent = currentCase.clues[index];
+                revealedClues = Math.max(revealedClues, index + 1);
+                updateButtons();
+            }
+        }
+
+        function selectSuspect(name, element) {
+            document.querySelectorAll('.suspect').forEach(s => s.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedSuspect = name;
+            updateButtons();
+        }
+
+        function makeAccusation() {
+            if (!selectedSuspect) {
+                alert('Please select a suspect first!');
+                return;
+            }
+
+            stopTimer();
+            gameStats.attempted++;
+
+            const resultSection = document.getElementById('resultSection');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultText = document.getElementById('resultText');
+
+            if (selectedSuspect === currentCase.solution) {
+                // Correct!
+                gameStats.solved++;
+                gameStats.streak++;
+                resultSection.classList.add('show');
+                resultSection.classList.remove('wrong');
+                resultTitle.textContent = '🎉 Case Solved! 🎉';
+                resultText.innerHTML = `
+                    <p><strong>Congratulations, detectives!</strong></p>
+                    <p>You correctly identified <strong>${selectedSuspect}</strong> as the culprit!</p>
+                    <p><strong>Solution:</strong> ${currentCase.explanation}</p>
+                `;
+            } else {
+                // Wrong!
+                gameStats.streak = 0;
+                resultSection.classList.add('show', 'wrong');
+                resultTitle.textContent = '❌ Case Unsolved ❌';
+                resultText.innerHTML = `
+                    <p><strong>Not quite right!</strong></p>
+                    <p>The real culprit was <strong>${currentCase.solution}</strong>, not ${selectedSuspect}.</p>
+                    <p><strong>Solution:</strong> ${currentCase.explanation}</p>
+                    <p>Review the clues and try another case!</p>
+                `;
+            }
+
+            updateStats();
+            updateButtons();
+        }
+
+        function updateStats() {
+            document.getElementById('casesSolved').textContent = gameStats.solved;
+            document.getElementById('currentStreak').textContent = gameStats.streak;
+            const rate = gameStats.attempted > 0 ? Math.round((gameStats.solved / gameStats.attempted) * 100) : 0;
+            document.getElementById('successRate').textContent = rate + '%';
+        }
+
+        function updateButtons() {
+            const hasCase = currentCase !== null;
+            const hasSelectedSuspect = selectedSuspect !== null;
+            const hasMoreClues = hasCase && revealedClues < currentCase.clues.length;
+
+            document.getElementById('revealClueBtn').disabled = !hasMoreClues;
+            document.getElementById('accuseBtn').disabled = !hasSelectedSuspect;
+            
+            if (hasCase) {
+                document.getElementById('revealClueBtn').textContent = 
+                    `Reveal Next Clue (${revealedClues}/${currentCase.clues.length})`;
+            }
+        }
+
+        function toggleTimer() {
+            timerEnabled = !timerEnabled;
+            const btn = document.getElementById('timerBtn');
+            const timerSection = document.getElementById('timerSection');
+            
+            if (timerEnabled) {
+                btn.textContent = 'Disable Timer Mode';
+                timerSection.style.display = 'block';
+                if (currentCase) startTimer();
+            } else {
+                btn.textContent = 'Enable Timer Mode';
+                timerSection.style.display = 'none';
+                stopTimer();
+            }
+        }
+
+        function startTimer() {
+            stopTimer();
+            timeLeft = 300; // 5 minutes
+            updateTimerDisplay();
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                
+                if (timeLeft <= 0) {
+                    stopTimer();
+                    alert('Time\'s up! The case remains unsolved...');
+                    gameStats.attempted++;
+                    gameStats.streak = 0;
+                    updateStats();
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timer').textContent = 
+                `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function resetCase() {
+            currentCase = null;
+            selectedSuspect = null;
+            revealedClues = 0;
+            document.getElementById('cluesSection').style.display = 'none';
+            document.getElementById('suspectsList').innerHTML = '<p style="text-align: center; color: #95a5a6; font-style: italic;">Start a case to see suspects</p>';
+            document.getElementById('resultSection').classList.remove('show', 'wrong');
+            document.getElementById('notesArea').value = '';
+            stopTimer();
+            updateButtons();
+        }
+
+        // Initialize the game
+        updateStats();
+        updateButtons();
+    </script>
+</body>
+</html>
